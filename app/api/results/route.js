@@ -9,10 +9,13 @@ export async function GET() {
   const yesRate = arr => arr.length === 0 ? null : Math.round(arr.filter(r => r.answer === 'yes').length / arr.length * 100);
   const avgFree = arr => arr.length === 0 ? null : Math.round(arr.reduce((s, r) => s + (r.freedom || 0), 0) / arr.length * 10) / 10;
   const avgTime = arr => arr.length === 0 ? null : Math.round(arr.reduce((s, r) => s + (r.elapsed || 0), 0) / arr.length / 100) / 10;
-  return NextResponse.json({
-    total: responses.length,
-    form1: { n: f1.length, yesRate: yesRate(f1), avgFreedom: avgFree(f1), avgTime: avgTime(f1) },
-    form2: { n: f2.length, yesRate: yesRate(f2), avgFreedom: avgFree(f2), avgTime: avgTime(f2) },
-    raw: responses,
-  });
+  return NextResponse.json(
+    {
+      total: responses.length,
+      form1: { n: f1.length, yesRate: yesRate(f1), avgFreedom: avgFree(f1), avgTime: avgTime(f1) },
+      form2: { n: f2.length, yesRate: yesRate(f2), avgFreedom: avgFree(f2), avgTime: avgTime(f2) },
+      raw: responses,
+    },
+    { headers: { 'Cache-Control': 'no-store' } }
+  );
 }

@@ -120,7 +120,10 @@ export default function Dashboard() {
     try {
       const res = await fetch('/api/reset', { method: 'POST' });
       if (!res.ok) throw new Error('Reset failed');
-      await fetchData();
+      // Clear state immediately so the UI reflects the reset right away,
+      // regardless of any in-flight interval fetches.
+      setData({ total: 0, form1: { n: 0, yesRate: null, avgFreedom: null, avgTime: null }, form2: { n: 0, yesRate: null, avgFreedom: null, avgTime: null }, raw: [] });
+      setLastUpdate(new Date().toLocaleTimeString());
     } catch (e) {
       alert('Reset failed: ' + e.message);
     } finally {

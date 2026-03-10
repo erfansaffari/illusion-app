@@ -14,8 +14,8 @@
    - Framework: Next.js (auto-detected)
    - Click Deploy
 
-3. **Add Vercel KV (for shared real-time data)**
-   - In your Vercel project → Storage tab → Create KV Store
+3. **Add Upstash Redis (for shared real-time data)**
+   - In your Vercel project → Storage tab → Create a Redis database
    - Connect it to the project — Vercel auto-injects the env vars
    - Redeploy (Settings → Deployments → Redeploy)
 
@@ -35,6 +35,6 @@
 | `/api/results` | Called by dashboard to fetch aggregated stats |
 | `/api/reset` | Reset button on dashboard |
 
-## Without Vercel KV
+## Without Upstash Redis
 
 The app works without KV (uses in-memory fallback) but responses won't persist across serverless function restarts. Fine for local dev, not reliable in production. Add KV for the real workshop.

@@ -82,15 +82,21 @@ export default function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/results');
+      const res = await fetch('/api/results?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('fetch failed');
       const json = await res.json();
       setData(json);
       setLastUpdate(new Date().toLocaleTimeString());
-    } catch {}
-    setLoading(false);
+    } catch (e) {
+      console.error('fetchData error:', e);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -99,10 +105,27 @@ export default function Dashboard() {
     return () => clearInterval(id);
   }, [fetchData]);
 
-  async function handleReset() {
-    if (!confirm('Reset all responses? This cannot be undone.')) return;
-    await fetch('/api/reset', { method: 'POST' });
-    await fetchData();
+  function handleResetClick() {
+    if (!confirmReset) {
+      setConfirmReset(true);
+      setTimeout(() => setConfirmReset(false), 4000);
+      return;
+    }
+    doReset();
+  }
+
+  async function doReset() {
+    setConfirmReset(false);
+    setResetting(true);
+    try {
+      const res = await fetch('/api/reset', { method: 'POST' });
+      if (!res.ok) throw new Error('Reset failed');
+      await fetchData();
+    } catch (e) {
+      alert('Reset failed: ' + e.message);
+    } finally {
+      setResetting(false);
+    }
   }
 
   const hasData = data && (data.form1.n > 0 || data.form2.n > 0);
@@ -186,7 +209,13 @@ export default function Dashboard() {
 
         <div style={s.btnRow}>
           <button style={{ ...s.btn, ...s.btnRefresh }} onClick={fetchData}>↻ Refresh now</button>
-          <button style={{ ...s.btn, ...s.btnReset }} onClick={handleReset}>Reset all data</button>
+          <button
+            style={{ ...s.btn, ...s.btnReset, ...(confirmReset ? { background: CORAL, color: WHITE } : {}) }}
+            onClick={handleResetClick}
+            disabled={resetting}
+          >
+            {resetting ? 'Resetting…' : confirmReset ? '⚠ Confirm reset?' : 'Reset all data'}
+          </button>
         </div>
       </div>
     </div>

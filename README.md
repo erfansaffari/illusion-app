@@ -38,3 +38,4 @@
 ## Without Vercel KV
 
 The app works without KV (uses in-memory fallback) but responses won't persist across serverless function restarts. Fine for local dev, not reliable in production. Add KV for the real workshop.
+# illusion-app

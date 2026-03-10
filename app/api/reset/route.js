@@ -3,6 +3,11 @@ import { NextResponse } from 'next/server';
 import { resetResponses } from '../../../lib/store';
 
 export async function POST() {
-  await resetResponses();
-  return NextResponse.json({ ok: true });
+  try {
+    await resetResponses();
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error('[reset] error:', e);
+    return NextResponse.json({ ok: false, error: e.message }, { status: 500 });
+  }
 }
